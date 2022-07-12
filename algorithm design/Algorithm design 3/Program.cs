@@ -6,8 +6,8 @@ namespace Algorithm_design_3
     internal class Program
     {
         // Setting the height and width of the map
-        static int width = 100;
-        static int height = 20;
+        static int width = 200;
+        static int height = 60;
 
         //initializing lists that will store the values we will generate later. We use them for drawing the map.
         static List<int> roadLeftRight = new();
@@ -75,10 +75,10 @@ namespace Algorithm_design_3
             var random = new Random();
 
             // Generating Wall
-            wall = GenerateCurve(wall, width * 1 / 4, 8);
+            wall = GenerateCurve(wall, width * 1 / 4, 12);
 
             // Generating the river
-            river = GenerateCurve(river, width * 3 / 4, 4);
+            river = GenerateCurve(river, width * 3 / 4, 3);
 
 
             // Generating the road that goes left to right
@@ -120,7 +120,7 @@ namespace Algorithm_design_3
         {
             var random = new Random();
             string title = ("ADVENTURE MAP");
-            string turret = ("[]");
+            string turret = ("[X]");
 
             for (int y = 0; y < height; y++)
             {
@@ -171,7 +171,7 @@ namespace Algorithm_design_3
                     //Drawing the road that leads down by checking if we are 5 steps before from the river and past the road on the y axis.
                     if (x == river[y] - 5 && y > roadLeftRight[x])
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("#");
                         continue;
                     }
@@ -179,7 +179,7 @@ namespace Algorithm_design_3
                     //Drawing the road that goes left to right
                     if (roadLeftRight[x] == y)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("#");
                         continue;
                     }
@@ -202,15 +202,24 @@ namespace Algorithm_design_3
                     }
 
                     // Drawing the trees
-                    var trees = new List<string> { "T", "X", "Z", "(", ")" };
+                    var trees = new List<string> { "T", "X", "Z", "(", ")", "$", "C", "&", "@", "¤", "£" };
 
                     if (x >= 1 && y >= 1 && x <= width / 4 && y != height - 1)
                     {
-                        int chance = width / 4;
+                        int chance = width / height;
 
-                        if (chance <= random.Next(width / 4, width) - (x * 4))
+                        if (chance >= random.Next(x))
                         {
-                            Console.ForegroundColor = ConsoleColor.Green;
+                            int treeColor = random.Next(2);
+
+                            if (treeColor == 1)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            }
                             Console.Write($"{trees[random.Next(trees.Count)]}");
                             continue;
                         }
@@ -221,6 +230,14 @@ namespace Algorithm_design_3
                     {
                         Console.ForegroundColor = ConsoleColor.Blue;
                         DrawCurve(river, y);
+                        continue;
+                    }
+                    // Drawing mountains
+                    int mountain = random.Next(x);
+                    if (mountain > width / 2 && y < roadLeftRight[x])
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.Write("^");
                         continue;
                     }
 
