@@ -3,22 +3,59 @@ using System.Collections.Generic;
 
 namespace Algorithm_design_3
 {
+
+    enum CurveDirection
+    {
+        Left,
+        Right,
+        Straight,
+    }
+
     internal class Program
     {
         // Setting the height and width of the map
         static int width = 200;
         static int height = 60;
 
-        //initializing lists that will store the values we will generate later. We use them for drawing the map.
-        static List<int> roadLeftRight = new();
-        static List<int> river = new();
-        static List<int> wall = new();
+        static ConsoleColor treeConsoleColor = ConsoleColor.Green;
+        static ConsoleColor darkTreeConsoleColor = ConsoleColor.DarkGreen;
 
+        static List<string> treeSymbolsList = new List<string> { "T", "X", "Z", "(", ")", "$", "C", "&", "@", "¤", "£" };
+
+        static string mapTitle = ("ADVENTURE MAP");
+        static string turretShape = ("[X]");
+
+        //initializing lists that will store the values we will generate later. We use them for drawing the map.
+        static List<int> roadLeftRightYPositionsList = new();
+        static List<int> riverXPositionsList = new();
+        static List<int> wallXPositionsList = new();
+
+        static Random random = new Random();
+
+
+        static CurveDirection GetRandomDirection(int curveChance)
+        {
+            int roll = random.Next(curveChance);
+
+            switch (roll)
+            {
+                case 0:
+                    return CurveDirection.Left;
+
+                case 1:
+                    return CurveDirection.Right;
+
+                default:
+                    return CurveDirection.Straight;
+            }
+
+        }
+
+        /**
+         * This section checks how a map element curves and ensures that the DrawMap method draws the appropriate symbol.
+         */
         static void DrawCurve(List<int> curves, int position)
         {
-            /* This section checks how a map element curves and ensures that the DrawMap method 
-             * draws the appropriate symbol*/
-
             if (curves[position + 1] == curves[position] + 1)
             {
                 Console.Write(@"\");
@@ -35,7 +72,7 @@ namespace Algorithm_design_3
                 return;
             }
         }
-        static List<int> GenerateCurve(List<int> curves, int position, int curveChance)
+        static List<int> GenerateCurve(int position, int curveChance)
         {
             /* This method generates a list of integers that determine the curvature of a map element. 
              * The user should set the curve chance when they call the method.
@@ -45,82 +82,81 @@ namespace Algorithm_design_3
              * so if you pass int 8 into curveChance, only on a 6 or 7 will the road curve
              * (8 is the exlusive upper bound of the random.Next method)*/
 
-            var random = new Random();
             int currentCurveX = position;
             var curveValues = new List<int>();
 
             for (int y = 0; y < height; y++)
             {
-                int chance = random.Next(curveChance);
+                CurveDirection direction = GetRandomDirection(curveChance);
+
+                if (direction != CurveDirection.Straight)
                 {
-                    if (chance >= curveChance - 2)
+                    if (direction == CurveDirection.Right)
                     {
-                        if (chance == curveChance - 1)
-                        {
-                            ++currentCurveX;
-                        }
-                        else
-                        {
-                            --currentCurveX;
-                        }
+                        ++currentCurveX;
                     }
-                    curveValues.Add(currentCurveX);
+                    else
+                    {
+                        --currentCurveX;
+                    }
                 }
+
+                curveValues.Add(currentCurveX);
+
             }
             return curveValues;
 
         }
         static void CreateMap()
         {
-            var random = new Random();
 
             // Generating Wall
-            wall = GenerateCurve(wall, width * 1 / 4, 12);
+            wallXPositionsList = GenerateCurve(width * 1 / 4, 12);
 
             // Generating the river
-            river = GenerateCurve(river, width * 3 / 4, 3);
+            riverXPositionsList = GenerateCurve(width * 3 / 4, 3);
 
 
             // Generating the road that goes left to right
             int roadStartY = height / 2;
             int currentRoadY = roadStartY;
-            /* This section checks if the current position is close to another map element,
-             * and if so, set a boolean to tell the later section that this position is close to another map element*/
             for (int x = 0; x < width; x++)
             {
-                int roadCurveChance = random.Next(8);
-                bool closeToObject = false;
+
+                /* This section checks if the current position is close to another map element,
+                 * and if so, set a boolean to tell the later section that this position is close to another map element*/
+                bool isCloseToMapElement = false;
+
                 for (int n = -3; n <= 5; n++)
                 {
-                    if (river.Contains(x + n) || wall.Contains(x + n))
+                    if (riverXPositionsList.Contains(x + n) || wallXPositionsList.Contains(x + n))
                     {
-                        closeToObject = true;
+                        isCloseToMapElement = true;
                         break;
                     }
                 }
-                if (roadCurveChance >= 6 && !closeToObject) // if we are not close to an object, the road can curve.
+
+                CurveDirection roadDirection = GetRandomDirection(8);
+
+                if (roadDirection != CurveDirection.Straight && !isCloseToMapElement) // if we are not close to an object, the road can curve.
                 {
-                    if (roadCurveChance == 6)
+                    if (roadDirection == CurveDirection.Right)
                     {
-                        roadLeftRight.Add(++currentRoadY);
+                        ++currentRoadY;
                     }
                     else
                     {
-                        roadLeftRight.Add(--currentRoadY);
+                        --currentRoadY;
                     }
                 }
-                else
-                {
-                    roadLeftRight.Add(currentRoadY);
-                }
+
+                roadLeftRightYPositionsList.Add(currentRoadY);
             }
             return;
         }
+
         static void DrawMap()
         {
-            var random = new Random();
-            string title = ("ADVENTURE MAP");
-            string turret = ("[X]");
 
             for (int y = 0; y < height; y++)
             {
@@ -152,16 +188,16 @@ namespace Algorithm_design_3
                      * the map positions weirdly by moving the current x position in the algorithm
                      * forward based on the lenght of the string*/
 
-                    if (x == width / 2 - title.Length / 2 && y == 1)
+                    if (x == width / 2 - mapTitle.Length / 2 && y == 1)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write(title);
-                        x += title.Length - 1;
+                        Console.Write(mapTitle);
+                        x += mapTitle.Length - 1;
                         continue;
                     }
 
                     // Drawing the bridge, we check if the road and river are intersecting, or will intersect in the coming coordinates.
-                    if (x >= river[y] - 1 && x <= river[y] + 3 && y + 1 == roadLeftRight[x] || x >= river[y] - 1 && x <= river[y] + 3 && y - 1 == roadLeftRight[x])
+                    if (x >= riverXPositionsList[y] - 1 && x <= riverXPositionsList[y] + 3 && y + 1 == roadLeftRightYPositionsList[x] || x >= riverXPositionsList[y] - 1 && x <= riverXPositionsList[y] + 3 && y - 1 == roadLeftRightYPositionsList[x])
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
                         Console.Write("=");
@@ -169,7 +205,7 @@ namespace Algorithm_design_3
                     }
 
                     //Drawing the road that leads down by checking if we are 5 steps before from the river and past the road on the y axis.
-                    if (x == river[y] - 5 && y > roadLeftRight[x])
+                    if (x == riverXPositionsList[y] - 5 && y > roadLeftRightYPositionsList[x])
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("#");
@@ -177,7 +213,7 @@ namespace Algorithm_design_3
                     }
 
                     //Drawing the road that goes left to right
-                    if (roadLeftRight[x] == y)
+                    if (roadLeftRightYPositionsList[x] == y)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("#");
@@ -185,74 +221,74 @@ namespace Algorithm_design_3
                     }
 
                     //Drawing the turrets, using a similar technique as when drawing the title to ensure correct positioning.
-                    if (x == wall[y] && y + 1 == roadLeftRight[x] || x == wall[y] && y - 1 == roadLeftRight[x])
+                    if (x == wallXPositionsList[y] && y + 1 == roadLeftRightYPositionsList[x] || x == wallXPositionsList[y] && y - 1 == roadLeftRightYPositionsList[x])
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.Write(turret);
-                        x += turret.Length - 1;
+                        Console.Write(turretShape);
+                        x += turretShape.Length - 1;
                         continue;
                     }
 
                     //Drawing the wall
-                    if (x >= wall[y] && x <= wall[y] + 1)
+                    if (x >= wallXPositionsList[y] && x <= wallXPositionsList[y] + 1)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        DrawCurve(wall, y);
+                        DrawCurve(wallXPositionsList, y);
                         continue;
                     }
+
 
                     // Drawing the trees
-                    var trees = new List<string> { "T", "X", "Z", "(", ")", "$", "C", "&", "@", "¤", "£" };
-
-                    if (x >= 1 && y >= 1 && x <= width / 4 && y != height - 1)
+                    double treeDensity = (double)-x / (width / 4) + 1;
+                    double treeRoll = random.NextDouble();
+                    if (treeRoll < treeDensity)
                     {
-                        int chance = width / height;
+                        int treeColor = random.Next(2);
 
-                        if (chance >= random.Next(x))
+                        if (treeColor == 1)
                         {
-                            int treeColor = random.Next(2);
-
-                            if (treeColor == 1)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            }
-                            Console.Write($"{trees[random.Next(trees.Count)]}");
-                            continue;
+                            Console.ForegroundColor = treeConsoleColor;
                         }
-                    }
-
-                    //Drawing the river
-                    if (x >= river[y] && x <= river[y] + 2)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        DrawCurve(river, y);
+                        else
+                        {
+                            Console.ForegroundColor = darkTreeConsoleColor;
+                        }
+                        Console.Write($"{treeSymbolsList[random.Next(treeSymbolsList.Count)]}");
                         continue;
                     }
+
+
+                    //Drawing the river
+                    if (x >= riverXPositionsList[y] && x <= riverXPositionsList[y] + 2)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        DrawCurve(riverXPositionsList, y);
+                        continue;
+                    }
+
                     // Drawing mountains
                     int mountain = random.Next(x);
-                    if (mountain > width / 2 && y < roadLeftRight[x])
+                    if (mountain > width / 2 && y < roadLeftRightYPositionsList[x])
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.Write("^");
                         continue;
                     }
 
+
+
+
                     //Filling in space thats not drawn with blanks
-                    else
-                    {
-                        Console.Write(" ");
-                        continue;
-                    }
+                    Console.Write(" ");
+
+
                 }
                 Console.WriteLine(); //ensuring line breaks at the end of the x-axis
             }
         }
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             CreateMap();
             DrawMap();
         }
