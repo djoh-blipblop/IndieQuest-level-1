@@ -40,7 +40,7 @@ namespace algorithm_design_7___mission_2
         }
         static void Main(string[] args)
         {
-            var data = new List<int>() { 3, 6, 2, 7, 8, 1, 9, 4, 10, 5 };
+            var data = new List<int>() { -1, -2, -3, -4, -5, };
 
             // Insertion sort
 
@@ -50,44 +50,52 @@ namespace algorithm_design_7___mission_2
             // Repeat this with all unsorted numbers until all the numbers are in the sorted list.
             int sortedCount = 1;
 
-            do
+            if (data.Count != 0)
             {
-                // Find the first unsorted number.
-                int indexOfFirstUnsortedNumber = sortedCount;
-                int firstUnsortedNumber = data[indexOfFirstUnsortedNumber];
-
-                // Test the sorted number to the left of it and see if it is bigger.
-                int testIndex = indexOfFirstUnsortedNumber - 1;
-
-                while (testIndex >= 0 && data[testIndex] > firstUnsortedNumber)
+                do
                 {
-                    // The sorted number is bigger!
-                    // Move the sorted number to the right since it is bigger than the unsorted number.
-                    // (Bigger numbers must be on the right of the smaller ones.)
-                    data[testIndex + 1] = data[testIndex];
+                    // Find the first unsorted number.
+                    int indexOfFirstUnsortedNumber = sortedCount;
+                    int firstUnsortedNumber = data[indexOfFirstUnsortedNumber];
+
+                    // Test the sorted number to the left of it and see if it is bigger.
+                    int testIndex = indexOfFirstUnsortedNumber - 1;
+
+                    while (testIndex >= 0 && data[testIndex] > firstUnsortedNumber)
+                    {
+                        // The sorted number is bigger!
+                        // Move the sorted number to the right since it is bigger than the unsorted number.
+                        // (Bigger numbers must be on the right of the smaller ones.)
+                        data[testIndex + 1] = data[testIndex];
 
 
-                    // Continue testing the next number on the left.
-                    testIndex--;
+                        // Continue testing the next number on the left.
+                        testIndex--;
 
+
+                        // Display data for diagnostic purposes.
+                        DisplayData(data);
+                    }
+
+                    // The unsorted number should now be placed into the spot where the last tested number was shifted away from.
+                    int insertionIndex = testIndex + 1;
+                    data[insertionIndex] = firstUnsortedNumber;
+
+                    // We've successfully sorted a new number.
+                    sortedCount++;
 
                     // Display data for diagnostic purposes.
                     DisplayData(data);
-                }
 
-                // The unsorted number should now be placed into the spot where the last tested number was shifted away from.
-                int insertionIndex = testIndex + 1;
-                data[insertionIndex] = firstUnsortedNumber;
+                } while (sortedCount < data.Count);
 
-                // We've successfully sorted a new number.
-                sortedCount++;
-
-                // Display data for diagnostic purposes.
+                Console.WriteLine($"The sorted numbers are: {string.Join(", ", data)}");
+            }
+            else
+            {
                 DisplayData(data);
-
-            } while (sortedCount < data.Count);
-
-            Console.WriteLine($"The sorted numbers are: {string.Join(", ", data)}");
+                Console.WriteLine($"{string.Join(", ", data)} The current item for sorting is empty.");
+            }
         }
     }
 }
