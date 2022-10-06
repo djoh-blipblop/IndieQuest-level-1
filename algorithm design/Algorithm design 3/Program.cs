@@ -14,7 +14,7 @@ namespace Algorithm_design_3
     internal class Program
     {
         // Setting the height and width of the map
-        static int width = 200;
+        static int width = 120;
         static int height = 60;
 
         static ConsoleColor treeConsoleColor = ConsoleColor.Green;

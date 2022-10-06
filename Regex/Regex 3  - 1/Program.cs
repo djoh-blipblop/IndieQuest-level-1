@@ -17,23 +17,27 @@ namespace Regex_3____1
             var namesOfAnyAlignment = new List<string>();
             var namesOfSpecialCases = new List<string>();
 
-            for (int axis1 = 0; axis1 < 3; axis1++)
+            int axis1;
+            int axis2;
 
-                for (int axis2 = 0; axis2 < 3; axis2++)
+            for (axis1 = 0; axis1 < 3; axis1++)
+
+                for (axis2 = 0; axis2 < 3; axis2++)
 
                     namesByAlignment[axis1, axis2] = new List<string>();
 
 
 
-            MatchCollection match = Regex.Matches(monsterManual, @"((chaotic)|(neutral)|(lawful)) ((evil)|neutral)|(good)");
+            MatchCollection match = Regex.Matches(monsterManual, @"((chaotic)|(neutral)|(lawful)) ((evil)|(neutral)|(good))");
 
             var axis1Values = new[] { "chaotic", "neutral", "lawful" };
             var axis2Values = new[] { "evil", "neutral", "good" };
 
-            string axis1Text = match.Groups[1].Value;
-            string axis2Text = match.Groups[2].Value;
-            int axis1 = Array.IndexOf(axis1Values, axis1Text);
-            int axis2 = Array.IndexOf(axis2Values, axis2Text);
+            string axis1Text = match[1].Value;
+            string axis2Text = match[2].Value;
+            axis1 = Array.IndexOf(axis1Values, axis1Text);
+            axis2 = Array.IndexOf(axis2Values, axis2Text);
+            string monsterName = match[1].Value;
             namesByAlignment[axis1, axis2].Add(monsterName);
 
 
@@ -49,6 +53,11 @@ namespace Regex_3____1
                 {
                     namesOfAnyAlignment.Add(monsterManualArray[i - 1]);
                 }
+            }
+
+            foreach (char name in monsterName)
+            {
+                Console.WriteLine(name);
             }
 
             Console.WriteLine("The names of monsters that are unaligned are:");
