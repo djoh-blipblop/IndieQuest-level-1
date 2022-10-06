@@ -9,7 +9,7 @@ namespace Regex_3____1
     {
         static void Main(string[] args)
         {
-            string[] monsterManualArray = File.ReadAllLines("MonsterManual.txt");
+            string[] monsterManualLines = File.ReadAllLines("MonsterManual.txt");
             string monsterManual = File.ReadAllText("MonsterManual.txt");
 
             var namesByAlignment = new List<string>[3, 3];
@@ -17,47 +17,72 @@ namespace Regex_3____1
             var namesOfAnyAlignment = new List<string>();
             var namesOfSpecialCases = new List<string>();
 
-            int axis1;
-            int axis2;
-
-            for (axis1 = 0; axis1 < 3; axis1++)
-
-                for (axis2 = 0; axis2 < 3; axis2++)
-
-                    namesByAlignment[axis1, axis2] = new List<string>();
 
 
-
-            MatchCollection match = Regex.Matches(monsterManual, @"((chaotic)|(neutral)|(lawful)) ((evil)|(neutral)|(good))");
-
-            var axis1Values = new[] { "chaotic", "neutral", "lawful" };
-            var axis2Values = new[] { "evil", "neutral", "good" };
-
-            string axis1Text = match[1].Value;
-            string axis2Text = match[2].Value;
-            axis1 = Array.IndexOf(axis1Values, axis1Text);
-            axis2 = Array.IndexOf(axis2Values, axis2Text);
-            string monsterName = match[1].Value;
-            namesByAlignment[axis1, axis2].Add(monsterName);
-
-
-
-
-            for (int i = 0; i < monsterManualArray.Length; i++)
+            for (int axis1Index = 0; axis1Index < 3; axis1Index++)
             {
-                if (Regex.IsMatch(monsterManualArray[i], @"(unaligned)"))
+                for (int axis2Index = 0; axis2Index < 3; axis2Index++)
                 {
-                    namesOfUnaligned.Add(monsterManualArray[i - 1]);
+                    namesByAlignment[axis1Index, axis2Index] = new List<string>();
                 }
-                else if (Regex.IsMatch(monsterManualArray[i], @"(any alignment)"))
+            }
+            string[] axis1Values = new[] { "chaotic", "neutral", "lawful" };
+            string[] axis2Values = new[] { "evil", "neutral", "good" };
+
+            for (int i = 0; i < monsterManualLines.Length; i++)
+            {
+                Match match = Regex.Match(monsterManualLines[i], @"((chaotic|neutral|lawful) (evil|neutral|good)|neutral)");
+                if (match.Success)
                 {
-                    namesOfAnyAlignment.Add(monsterManualArray[i - 1]);
+                    string monsterName = monsterManualLines[i - 1];
+
+                    if (match.Groups[1].Value == "neutral")
+                    {
+                        namesByAlignment[1, 1].Add(monsterName);
+                    }
+                    else
+                    {
+                        string axis1Text = match.Groups[2].Value;
+                        string axis2Text = match.Groups[3].Value;
+                        int axis1Index = Array.IndexOf(axis1Values, axis1Text);
+                        int axis2Index = Array.IndexOf(axis2Values, axis2Text);
+                        namesByAlignment[axis1Index, axis2Index].Add(monsterName);
+                    }
+                }
+                else if (Regex.IsMatch(monsterManualLines[i], @"unaligned"))
+                {
+                    namesOfUnaligned.Add(monsterManualLines[i - 1]);
+                }
+                else if (Regex.IsMatch(monsterManualLines[i], @"any alignment"))
+                {
+                    namesOfAnyAlignment.Add(monsterManualLines[i - 1]);
+                }
+                else if (Regex.IsMatch(monsterManualLines[i], @"any.*alignment"))
+                {
+                    namesOfSpecialCases.Add(monsterManualLines[i - 1] + monsterManualLines[i].Substring(monsterManualLines[i].IndexOf(",")));
                 }
             }
 
-            foreach (char name in monsterName)
+
+            for (int axis1Index = 0; axis1Index < 3; axis1Index++)
             {
-                Console.WriteLine(name);
+                for (int axis2Index = 0; axis2Index < 3; axis2Index++)
+                {
+                    string aligmentName = $"{axis1Values[axis1Index]} {axis2Values[axis2Index]}";
+
+                    if (aligmentName == "neutral neutral")
+                    {
+                        aligmentName = "true neutral";
+                    }
+                    Console.WriteLine($"The names of the monsters that are {aligmentName} are");
+                    Console.WriteLine("---------------------------------------------");
+                    foreach (string name in namesByAlignment[axis1Index, axis2Index])
+                    {
+                        Console.WriteLine(name);
+                    }
+                    Console.WriteLine();
+
+                }
             }
 
             Console.WriteLine("The names of monsters that are unaligned are:");
@@ -75,6 +100,16 @@ namespace Regex_3____1
             {
                 Console.WriteLine(name);
             }
+
+            Console.WriteLine();
+
+            Console.WriteLine("The names of monsters with special cases are:");
+            Console.WriteLine("-------------------------------------------------------");
+            foreach (string name in namesOfSpecialCases)
+            {
+                Console.WriteLine(name);
+            }
+
 
         }
     }
