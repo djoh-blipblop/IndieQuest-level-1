@@ -15,11 +15,11 @@ namespace Monster_manual_1
             Console.WriteLine($"Aligment: {monster.Alignment}");
             Console.WriteLine($"Default HP: {monster.HPDefault}");
             Console.WriteLine($"Rolled HP: {monster.HPRoll}");
-            Console.WriteLine($"Armor Class: {monster.ArmorClass}");
+            Console.WriteLine($"Armor Class: {monster.Armor.Class}");
 
-            if (monster.ArmorType != "")
+            if (monster.Armor.Type != "")
             {
-                Console.WriteLine($"Armor type: {monster.ArmorType}");
+                Console.WriteLine($"Armor type: {monster.Armor.Type}");
             }
 
             Console.WriteLine($"Speed: {@monster.Speed}");
@@ -57,8 +57,6 @@ namespace Monster_manual_1
             public string Alignment;
             public int HPDefault;
             public string HPRoll;
-            public int ArmorClass;
-            public string ArmorType;
             public string Speed;
             public int BurrowingSpeed;
             public int FlyingSpeed;
@@ -66,8 +64,15 @@ namespace Monster_manual_1
             public int ClimbingSpeed;
             public double ChallengeRating;
             public int XPValue;
-
+            public ArmorInformation Armor;
         }
+
+        class ArmorInformation
+        {
+            public int Class;
+            public string Type;
+        }
+
         static void Main(string[] args)
         {
             /*Setting up the lists etc.*/
@@ -95,9 +100,14 @@ namespace Monster_manual_1
                     Alignment = match.Groups[3].Value,
                     HPDefault = Convert.ToInt32(match.Groups[4].Value),
                     HPRoll = match.Groups[5].Value,
-                    ArmorClass = Convert.ToInt32(match.Groups[6].Value),
-                    ArmorType = match.Groups[7].Value,
-                    XPValue = Convert.ToInt32(match.Groups[11].Value.Replace(",", "")),
+                    /*ArmorClass = Convert.ToInt32(match.Groups[6].Value),
+                    ArmorType = match.Groups[7].Value,*/
+                    Armor = new ArmorInformation
+                    {
+                        Class = Convert.ToInt32(match.Groups[6].Value),
+                        Type = match.Groups[7].Value,
+                    },
+                    XPValue = Convert.ToInt32(match.Groups[11].Value.Replace(",", "")), //The replace is needed because XP sometimes includes a comma (ie 5,900).
                     Speed = match.Groups[8].Value,
                 };
                 monsters.Add(monster);
@@ -121,53 +131,6 @@ namespace Monster_manual_1
                 Regex.Match(speedLine, regularSpeed);
                 monster.Speed = Convert.ToInt32(match.Groups[regularSpeed].Value);*/
             }
-
-
-            /* Test to see that everything gets recorded properly, remove later
-             #2 bug, for shape shifters the search catches the AC in human form, and then ands a bunch of texts about armor
-            in shifted or hybrid from in the armor type slot (Doesnt matter)*/
-            /* foreach (MonsterEntry monster in monsters)
-             {
-                 Console.WriteLine(monster.Name);
-                 Console.WriteLine("-----------------------");
-                 Console.WriteLine($"Type: {monster.Description}");
-                 Console.WriteLine($"Aligment: {monster.Alignment}");
-                 Console.WriteLine($"Default HP: {monster.HPDefault}");
-                 Console.WriteLine($"Rolled HP: {monster.HPRoll}");
-                 Console.WriteLine($"Armor Class: {monster.ArmorClass}");
-                 Console.WriteLine($"Speed: {@monster.Speed}");
-
-                 if (monster.ArmorType != "")
-                 {
-                     Console.WriteLine($"Armor type: {monster.ArmorType}");
-                 }
-
-                  Console.WriteLine($"Walking speed: {monster.Speed}");
-
-                 if (monster.BurrowingSpeed > 0)
-                 {
-                     Console.WriteLine($"Burrowing Speed: {monster.BurrowingSpeed}");
-                 }
-
-                 if (monster.FlyingSpeed > 0)
-                 {
-                     Console.WriteLine($"Flying Speed: {monster.FlyingSpeed}");
-                 }
-
-                 if (monster.SwimmingSpeed > 0)
-                 {
-                     Console.WriteLine($"Swimming Speed: {monster.SwimmingSpeed}");
-                 }
-
-                 if (monster.ClimbingSpeed > 0)
-                 {
-                     Console.WriteLine($"Climbing Speed: {monster.ClimbingSpeed}");
-                 }
-
-                 Console.WriteLine($"Challenge Rating: {monster.ChallengeRating}");
-                 Console.WriteLine($"XP Value: {monster.XPValue}");
-                 Console.WriteLine();
-             } */
 
             /*Begin writing the user interface*/
             bool quit = false;
