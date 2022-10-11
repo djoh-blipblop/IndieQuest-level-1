@@ -9,9 +9,8 @@ namespace Monster_manual_1
     {
         static void DisplayMonster(MonsterEntry monster)
         {
-
-            Console.WriteLine(monster.Name);
             Console.WriteLine("-----------------------");
+            Console.WriteLine($"Name: {monster.Name}");
             Console.WriteLine($"Type: {monster.Description}");
             Console.WriteLine($"Aligment: {monster.Alignment}");
             Console.WriteLine($"Default HP: {monster.HPDefault}");
@@ -72,7 +71,6 @@ namespace Monster_manual_1
         static void Main(string[] args)
         {
             /*Setting up the lists etc.*/
-            string[] monsterManualLines = File.ReadAllLines("MonsterManual.txt");
             string monsterManual = File.ReadAllText("MonsterManual.txt");
 
             var monsters = new List<MonsterEntry>();
@@ -193,7 +191,14 @@ namespace Monster_manual_1
                     }
                 }
 
-                if (searchResults.Count > 0)
+                if (searchResults.Count == 1)
+                {
+                    MonsterEntry selectedMonster = searchResults[0];
+                    DisplayMonster(selectedMonster);
+
+                }
+
+                if (searchResults.Count > 1)
                 {
                     Console.WriteLine();
                     Console.WriteLine("Which monster do did you want to look up?");
@@ -203,7 +208,6 @@ namespace Monster_manual_1
                         Console.WriteLine($"{i + 1}: {searchResults[i].Name}");
                     }
 
-                    // Console.WriteLine("To quit, enter 0");
                     Console.WriteLine("Enter number:");
                     string selection = Console.ReadLine();
                     int selected = Convert.ToInt32(selection) - 1;
@@ -212,14 +216,13 @@ namespace Monster_manual_1
                     Console.WriteLine($"Displaying information for {selectedMonster.Name}");
                     Console.WriteLine("-------------------");
                     DisplayMonster(selectedMonster);
-
                 }
-                else
+
+                if (searchResults.Count == 0)
                 {
                     Console.WriteLine();
                     Console.WriteLine("No monsters matching that search were found, please try again");
                 }
-
             }
         }
     }
