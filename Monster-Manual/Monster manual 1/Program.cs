@@ -7,6 +7,50 @@ namespace Monster_manual_1
 {
     internal class Program
     {
+        static void DisplayMonster(MonsterEntry monster)
+        {
+
+            Console.WriteLine(monster.Name);
+            Console.WriteLine("-----------------------");
+            Console.WriteLine($"Type: {monster.Description}");
+            Console.WriteLine($"Aligment: {monster.Alignment}");
+            Console.WriteLine($"Default HP: {monster.HPDefault}");
+            Console.WriteLine($"Rolled HP: {monster.HPRoll}");
+            Console.WriteLine($"Armor Class: {monster.ArmorClass}");
+
+            if (monster.ArmorType != "")
+            {
+                Console.WriteLine($"Armor type: {monster.ArmorType}");
+            }
+
+            Console.WriteLine($"Speed: {@monster.Speed}");
+
+            if (monster.BurrowingSpeed > 0)
+            {
+                Console.WriteLine($"Burrowing Speed: {monster.BurrowingSpeed}");
+            }
+
+            if (monster.FlyingSpeed > 0)
+            {
+                Console.WriteLine($"Flying Speed: {monster.FlyingSpeed}");
+            }
+
+            if (monster.SwimmingSpeed > 0)
+            {
+                Console.WriteLine($"Swimming Speed: {monster.SwimmingSpeed}");
+            }
+
+            if (monster.ClimbingSpeed > 0)
+            {
+                Console.WriteLine($"Climbing Speed: {monster.ClimbingSpeed}");
+            }
+
+            Console.WriteLine($"Challenge Rating: {monster.ChallengeRating}");
+            Console.WriteLine($"XP Value: {monster.XPValue}");
+            Console.WriteLine();
+            return;
+        }
+
         class MonsterEntry
         {
             public string Name;
@@ -139,13 +183,13 @@ namespace Monster_manual_1
                 Console.WriteLine();
                 Console.WriteLine(searchByName);
                 string searchQuery = Console.ReadLine();
-                var searchResults = new List<string>();
+                var searchResults = new List<MonsterEntry>();
 
                 foreach (MonsterEntry monster in monsters)
                 {
                     if (Regex.IsMatch(monster.Name, searchQuery, RegexOptions.IgnoreCase))
                     {
-                        searchResults.Add(monster.Name);
+                        searchResults.Add(monster);
                     }
                 }
 
@@ -156,16 +200,18 @@ namespace Monster_manual_1
                     Console.WriteLine();
                     for (int i = 0; i < searchResults.Count; i++)
                     {
-                        Console.WriteLine($"{i + 1}: {searchResults[i]}");
+                        Console.WriteLine($"{i + 1}: {searchResults[i].Name}");
                     }
 
                     // Console.WriteLine("To quit, enter 0");
                     Console.WriteLine("Enter number:");
                     string selection = Console.ReadLine();
                     int selected = Convert.ToInt32(selection) - 1;
+                    MonsterEntry selectedMonster = searchResults[selected];
 
-                    Console.WriteLine($"Displaying information for {monsters[selected]}");
-
+                    Console.WriteLine($"Displaying information for {selectedMonster.Name}");
+                    Console.WriteLine("-------------------");
+                    DisplayMonster(selectedMonster);
 
                 }
                 else
