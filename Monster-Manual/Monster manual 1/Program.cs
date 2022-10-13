@@ -43,7 +43,7 @@ namespace Monster_manual_1
                 Console.WriteLine($"Climbing Speed: {monster.ClimbingSpeed} ft.");
             }
 
-            if (monster.Hover == true)
+            if (monster.Hover)
             {
                 Console.WriteLine("Can Hover.");
             }
@@ -218,6 +218,7 @@ namespace Monster_manual_1
                 }
 
                 Match isHover = Regex.Match(speedLine, @"hover");
+                if (isHover.Success)
                 {
                     monster.Hover = true;
                 }
